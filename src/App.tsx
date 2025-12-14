@@ -3,19 +3,23 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SupabaseAuthProvider, useSupabaseAuth } from "@/contexts/SupabaseAuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { DataProvider } from "@/contexts/DataContext";
 import AppLayout from "@/components/layout/AppLayout";
-import SupabaseAuth from "@/pages/SupabaseAuth";
-import SupabaseDashboard from "@/components/SupabaseDashboard";
-import SupabaseProjects from "@/components/SupabaseProjects";
-import SupabaseTasks from "@/components/SupabaseTasks";
-import SupabaseTeam from "@/components/SupabaseTeam";
+import Auth from "@/pages/Auth";
+import Dashboard from "@/pages/Dashboard";
+import Projects from "@/pages/Projects";
+import ProjectDetail from "@/pages/ProjectDetail";
+import Tasks from "@/pages/Tasks";
+import Teams from "@/pages/Teams";
+import Users from "@/pages/Users";
+import Notifications from "@/pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useSupabaseAuth();
+  const { user, isLoading } = useAuth();
   
   if (isLoading) {
     return (
@@ -33,7 +37,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useSupabaseAuth();
+  const { user, isLoading } = useAuth();
   
   if (isLoading) {
     return (
@@ -58,7 +62,7 @@ function AppRoutes() {
         path="/auth"
         element={
           <PublicRoute>
-            <SupabaseAuth />
+            <Auth />
           </PublicRoute>
         }
       />
@@ -66,7 +70,7 @@ function AppRoutes() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <SupabaseDashboard />
+            <Dashboard />
           </ProtectedRoute>
         }
       />
@@ -74,7 +78,7 @@ function AppRoutes() {
         path="/teams"
         element={
           <ProtectedRoute>
-            <SupabaseTeam />
+            <Teams />
           </ProtectedRoute>
         }
       />
@@ -82,7 +86,15 @@ function AppRoutes() {
         path="/projects"
         element={
           <ProtectedRoute>
-            <SupabaseProjects />
+            <Projects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects/:id"
+        element={
+          <ProtectedRoute>
+            <ProjectDetail />
           </ProtectedRoute>
         }
       />
@@ -90,7 +102,23 @@ function AppRoutes() {
         path="/tasks"
         element={
           <ProtectedRoute>
-            <SupabaseTasks />
+            <Tasks />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute>
+            <Users />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         }
       />
@@ -105,9 +133,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SupabaseAuthProvider>
-          <AppRoutes />
-        </SupabaseAuthProvider>
+        <AuthProvider>
+          <DataProvider>
+            <AppRoutes />
+          </DataProvider>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

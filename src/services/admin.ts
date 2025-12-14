@@ -24,7 +24,7 @@ export async function registerAdmin({ email, password, nome }: RegisterAdminInpu
   try {
     const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { nome } } })
     if (error) {
-      const msg = (error as any)?.message || ''
+      const msg = error?.message || ''
       if (/already/i.test(msg)) return { success: false, error: { code: 'EMAIL_IN_USE', message: 'Email já cadastrado' } }
       return { success: false, error: { code: 'SIGNUP_ERROR', message: msg || 'Erro ao cadastrar' } }
     }
@@ -36,7 +36,8 @@ export async function registerAdmin({ email, password, nome }: RegisterAdminInpu
     if (promoteError) return { success: false, error: { code: 'PROMOTE_ERROR', message: promoteError.message } }
 
     return { success: true, userId: id }
-  } catch (e: any) {
-    return { success: false, error: { code: 'NETWORK_ERROR', message: e?.message || 'Problema de conexão' } }
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Problema de conexão'
+    return { success: false, error: { code: 'NETWORK_ERROR', message } }
   }
 }

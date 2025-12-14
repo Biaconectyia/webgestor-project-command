@@ -98,10 +98,10 @@ export function useCriarProjeto() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (projeto: any) => {
+    mutationFn: async (projeto: Record<string, unknown>) => {
       const { data, error } = await supabase
         .from('projetos')
-        .insert([projeto])
+        .insert(projeto)
         .select()
         .single()
       
@@ -119,10 +119,10 @@ export function useCriarTarefa() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (tarefa: any) => {
+    mutationFn: async (tarefa: Record<string, unknown>) => {
       const { data, error } = await supabase
         .from('tarefas')
-        .insert([tarefa])
+        .insert(tarefa)
         .select()
         .single()
       
@@ -140,7 +140,7 @@ export function useAtualizarTarefa() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async ({ id, ...updates }: any) => {
+    mutationFn: async ({ id, ...updates }: { id: string; [key: string]: unknown }) => {
       const { data, error } = await supabase
         .from('tarefas')
         .update(updates)
@@ -152,7 +152,10 @@ export function useAtualizarTarefa() {
       return data
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['tarefas', data.projeto_id] })
+      const projetoId = (data as Record<string, unknown>)?.projeto_id
+      if (projetoId) {
+        queryClient.invalidateQueries({ queryKey: ['tarefas', projetoId] })
+      }
     },
   })
 }
