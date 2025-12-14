@@ -46,7 +46,7 @@ export default function SupabaseTasks({ projetoId }: { projetoId?: string }) {
     try {
       await atualizarTarefa.mutateAsync({
         id: tarefaId,
-        status: newStatus,
+        status: newStatus as 'todo' | 'in_progress' | 'done',
       })
     } catch (error) {
       console.error('Erro ao atualizar tarefa:', error)
