@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useData } from '@/contexts/DataContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,7 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { profile, logout } = useSupabaseAuth();
   const { getUnreadNotificationsCount } = useData();
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const unreadCount = getUnreadNotificationsCount();
   
   const filteredNavItems = navItems.filter(item => 
-    item.roles.includes(user?.role || 'collaborator')
+    item.roles.includes(profile?.role || 'collaborator')
   );
 
   const handleLogout = () => {
@@ -104,14 +104,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                {user?.name?.charAt(0).toUpperCase()}
+                {profile?.nome?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {user?.name}
+                {profile?.nome}
               </p>
-              {user?.role && getRoleBadge(user.role)}
+              {profile?.role && getRoleBadge(profile.role)}
             </div>
           </div>
         </div>
